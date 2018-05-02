@@ -14,6 +14,51 @@ function __powerline_left_segment {
   (( SEGMENTS_AT_LEFT += 1 ))
 }
 
+function __powerline_battery_prompt {
+  local color=""
+  local battery_status="$(battery_percentage 2> /dev/null)"
+
+  if [[ -z "${battery_status}" ]] || [[ "${battery_status}" = "-1" ]] || [[ "${battery_status}" = "no" ]]; then
+    true
+  else
+	if [[ $battery_status -gt $BATTERY_STATUS_THEME_PROMPT_DISPLAY_THRESHOLD ]]; then
+		true
+	else
+	    if [[ "$((10#${battery_status}))" -le 10 ]]; then
+	      color="${BATTERY_STATUS_THEME_PROMPT_CRITICAL_COLOR}"
+	    elif [[ "$((10#${battery_status}))" -le 30 ]]; then
+	      color="${BATTERY_STATUS_THEME_PROMPT_LOW_COLOR}"
+	    else
+	      color="${BATTERY_STATUS_THEME_PROMPT_GOOD_COLOR}"
+	    fi
+	    ac_adapter_connected && battery_status="${BATTERY_AC_CHAR}${battery_status}"
+	    echo "${battery_status}%|${color}"
+        fi
+  fi
+}
+
+function ac_adapter_connected {
+	[ "$(upower -i /org/freedesktop/UPower/devices/line_power_AC | grep online | tr -d ' ' | cut -d\: -f2)" == "yes" ]
+}
+
+function __powerline_battery2_prompt {
+  if [[ "${THEME_BATTERY_PERCENTAGE_CHECK}" == true ]]; then
+	  BATTERY_SEGMENT=""
+          battery=$(battery_percentage)
+	  battery=20
+          if [ $battery -le 10 ]; then
+                  BATTERY_SEGMENT="$(set_color 250 52)🗲 ${battery}% $(set_color - -)"
+          elif [ $battery -le 30 ]; then
+                  BATTERY_SEGMENT="$(set_color 124 -)🗲 ${battery}% $(set_color - -)"
+          elif [ $battery -le 75 ]; then
+                  BATTERY_SEGMENT="$(set_color 166 -)🗲 ${battery}% $(set_color - -)"
+          fi
+	  if [ -n "$BATTERY_SEGMENT" ]; then
+		  echo "$BATTERY_SEGMENT"
+	  fi
+  fi
+}
+
 function __powerline_prompt_command {
   local last_status="$?" ## always the first
   local separator_char="${POWERLINE_PROMPT_CHAR}"
@@ -35,17 +80,7 @@ function __powerline_prompt_command {
   [[ "${last_status}" -ne 0 ]] && __powerline_left_segment $(__powerline_last_status_prompt ${last_status})
   [[ -n "${LEFT_PROMPT}" ]] && LEFT_PROMPT+="$(set_color ${LAST_SEGMENT_COLOR} -)${normal}"
 
-  BATTERY_SEGMENT=""
-  if [[ "${THEME_BATTERY_PERCENTAGE_CHECK}" == true ]]; then
-	  battery=$(battery_percentage)
-	  if [ $battery -le 75 ]; then
-		  BATTERY_SEGMENT="${orange}🗲 ${battery}%$(set_color - -) $separator_char"
-	  elif [ $battery -le 25 ]; then
-		  BATTERY_SEGMENT="${red}🗲 ${battery}%$(set_color - -) $separator_char"
-	  fi
-  fi
-
-  PS1="${BATTERY_SEGMENT}${LEFT_PROMPT}\n$(set_color - -)$separator_char "
+  PS1="${LEFT_PROMPT}\n$(set_color - -)$separator_char "
 
   ## cleanup ##
   unset LAST_SEGMENT_COLOR \
