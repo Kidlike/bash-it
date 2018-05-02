@@ -35,7 +35,17 @@ function __powerline_prompt_command {
   [[ "${last_status}" -ne 0 ]] && __powerline_left_segment $(__powerline_last_status_prompt ${last_status})
   [[ -n "${LEFT_PROMPT}" ]] && LEFT_PROMPT+="$(set_color ${LAST_SEGMENT_COLOR} -)${normal}"
 
-  PS1="${LEFT_PROMPT}\n$(set_color - -)$separator_char "
+  BATTERY_SEGMENT=""
+  if [[ "${THEME_BATTERY_PERCENTAGE_CHECK}" == true ]]; then
+	  battery=$(battery_percentage)
+	  if [ $battery -le 75 ]; then
+		  BATTERY_SEGMENT="${orange}🗲 ${battery}%$(set_color - -) $separator_char"
+	  elif [ $battery -le 25 ]; then
+		  BATTERY_SEGMENT="${red}🗲 ${battery}%$(set_color - -) $separator_char"
+	  fi
+  fi
+
+  PS1="${BATTERY_SEGMENT}${LEFT_PROMPT}\n$(set_color - -)$separator_char "
 
   ## cleanup ##
   unset LAST_SEGMENT_COLOR \
