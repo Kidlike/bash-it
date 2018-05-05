@@ -45,7 +45,7 @@ function __powerline_battery_prompt {
 }
 
 function ac_adapter_connected {
-	[ "$(upower -i /org/freedesktop/UPower/devices/line_power_AC | grep online | tr -d ' ' | cut -d\: -f2)" == "yes" ]
+	[ "$(upower -i /org/freedesktop/UPower/devices/line_power_AC | grep online | awk '{print $2}')" == "yes" ]
 }
 
 function __powerline_prompt_command {
