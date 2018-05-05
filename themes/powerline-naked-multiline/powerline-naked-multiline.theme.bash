@@ -48,6 +48,6 @@ THEME_CLOCK_FORMAT=${THEME_CLOCK_FORMAT:="%H:%M:%S"}
 IN_VIM_THEME_PROMPT_COLOR=245
 IN_VIM_THEME_PROMPT_TEXT="vim"
 
-POWERLINE_PROMPT=${POWERLINE_PROMPT:="battery user_info scm cwd"}
+POWERLINE_PROMPT=${POWERLINE_PROMPT:="battery kube user_info scm cwd"}
 
 safe_append_prompt_command __powerline_prompt_command

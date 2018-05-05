@@ -14,9 +14,17 @@ function __powerline_left_segment {
   (( SEGMENTS_AT_LEFT += 1 ))
 }
 
+function __powerline_kube_prompt {
+	if [ -n "$KUBE_NS" ]; then
+		local icon="⎈"
+		echo "${icon} ${KUBE_NS}|-"
+	fi
+}
+
 function __powerline_battery_prompt {
   local color=""
   local battery_status="$(battery_percentage 2> /dev/null)"
+  battery_status=40
 
   if [[ -z "${battery_status}" ]] || [[ "${battery_status}" = "-1" ]] || [[ "${battery_status}" = "no" ]]; then
     true
@@ -39,24 +47,6 @@ function __powerline_battery_prompt {
 
 function ac_adapter_connected {
 	[ "$(upower -i /org/freedesktop/UPower/devices/line_power_AC | grep online | tr -d ' ' | cut -d\: -f2)" == "yes" ]
-}
-
-function __powerline_battery2_prompt {
-  if [[ "${THEME_BATTERY_PERCENTAGE_CHECK}" == true ]]; then
-	  BATTERY_SEGMENT=""
-          battery=$(battery_percentage)
-	  battery=20
-          if [ $battery -le 10 ]; then
-                  BATTERY_SEGMENT="$(set_color 250 52)🗲 ${battery}% $(set_color - -)"
-          elif [ $battery -le 30 ]; then
-                  BATTERY_SEGMENT="$(set_color 124 -)🗲 ${battery}% $(set_color - -)"
-          elif [ $battery -le 75 ]; then
-                  BATTERY_SEGMENT="$(set_color 166 -)🗲 ${battery}% $(set_color - -)"
-          fi
-	  if [ -n "$BATTERY_SEGMENT" ]; then
-		  echo "$BATTERY_SEGMENT"
-	  fi
-  fi
 }
 
 function __powerline_prompt_command {
