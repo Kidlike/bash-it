@@ -24,7 +24,6 @@ function __powerline_kube_prompt {
 function __powerline_battery_prompt {
   local color=""
   local battery_status="$(battery_percentage 2> /dev/null)"
-  battery_status=40
 
   if [[ -z "${battery_status}" ]] || [[ "${battery_status}" = "-1" ]] || [[ "${battery_status}" = "no" ]]; then
     true
